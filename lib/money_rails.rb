@@ -5,16 +5,19 @@ module MoneyRails
   
   def self.included(base)
     base.extend(ClassMethods)
-    base.composed_of(:price,
-      :class_name => 'Money',
-      :mapping => [
-        ['price_cents', 'cents'],
-        ['price_currency', 'currency_string']
-      ])
   end
   
   module ClassMethods
-    def money(method_name)
+    def money(method_name, options = {})
+      
+      subunit_column_name = options.fetch(:subunit_column, "#{method_name}_cents")
+      currency_column_name = options.fetch(:currency_column, "#{method_name}_currency")
+      self.composed_of(method_name.to_sym,
+        :class_name => 'Money',
+        :mapping => [
+          [subunit_column_name, 'cents'],
+          [currency_column_name, 'currency_string']
+        ])
       
     end
   end

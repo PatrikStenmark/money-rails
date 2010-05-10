@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.dirname(__FILE__) + '/spec_helper'
 
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
 ActiveRecord::Migration.verbose = false
@@ -7,13 +7,37 @@ ActiveRecord::Schema.define do
     t.integer :price_cents
     t.string :price_currency
   end
+  
+  create_table :complex_products, :force => true do |t|
+    t.integer :price_subunit
+    t.string :price_currency_string
+  end
 end
 
 class Product < ActiveRecord::Base
   
 end
 
+
+class ComplexProduct < ActiveRecord::Base
+  
+end
+
+
 describe "money rails" do
+  context "complex product" do
+    it "should handle custom columns" do
+      ComplexProduct.money :price, :subunit_column => 'price_subunit', :currency_column => 'price_currency_string'
+      money = Money.new(1000, 'SEK')
+      @product = ComplexProduct.new(:price => money)
+      
+      @product.save!
+      puts Product.first.inspect
+      @product = ComplexProduct.find(@product.id)
+      @product.price.should == money
+    end
+  end
+  
   before do
     
   end
