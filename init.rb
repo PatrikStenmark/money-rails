@@ -1,1 +1,0 @@
-require 'money_rails'
