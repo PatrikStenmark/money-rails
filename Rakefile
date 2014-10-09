@@ -1,23 +1,12 @@
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rubygems' unless ENV['NO_RUBYGEMS']
+require 'spec/rake/spectask'
+require 'bundler/setup'
 
-desc 'Default: run unit tests.'
-task :default => :test
+task :default => :spec
 
-desc 'Test the money_rails plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
-
-desc 'Generate documentation for the money_rails plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Money-rails'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+desc "Run specs"
+Spec::Rake::SpecTask.new do |t|
+  Bundler.require(:test)
+  t.spec_files = FileList['spec/**/*_spec.rb']
+  t.spec_opts = %w(-fs --color)
 end

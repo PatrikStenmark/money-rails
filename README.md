@@ -1,20 +1,35 @@
-Money-rails
-===========
+### Money v3 Rails plugin
 
-A simple gem/plugin for integrating the [money](http://github.com/FooBarWidget/money) gem with a Rails app. Since the 2.3.0 of the money gem a simple `composed_of` isn't enough to get it to work, you either need to monkey patch money or do some `serialize` magic with the currency. 
+Money v3 supports rails via `composed_of`, which is what you'll want to use if you just have a couple money fields (see the Money gem's README).
 
-This gem gives you a `money` method on your Active Record objects:
+If you have a lot of money fields, it gets very un-DRY (WET?). This plugin helps with that. It doesn't really need to be a plugin, even, it's just nice to document and package things as a unit sometimes.
 
-    class Product < ActiveRecord::Base
+### Usage
+
+Basic:
+
+    class Widget
       money :price
     end
 
-This is the simplest case, and it will look for the columns `price_cents` and `price_currency`, which should be an int and a string respectively. 
+Slightly more custom:
 
-If you want to use other column names, you can do
-
-    class Product < ActiveRecord::Base
-      money :price, :subunit_colum => 'cost_cents', :currency_column => 'currency_of_costs'
+    class Widget
+      money :price, :subunit_column  => 'price_subunit',
+                    :currency_column => 'price_currency_string'
     end
 
-Copyright (c) 2010 Patrik Stenmark, released under the MIT license
+Slightly more custom, but all over:
+
+    Money::Rails.config.subunit_column_ext  = 'subunit'
+    Money::Rails.config.currency_column_ext = 'currency_string'
+
+    # database values are 'price_subunit' and 'price_currency_string'
+    class Widget
+      money :price
+    end
+
+In all cases:
+
+    w = Widget.new(:price => "5.00")
+    w.price # => Money.new(500, 'USD')
